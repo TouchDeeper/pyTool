@@ -62,10 +62,10 @@ class Action(QMainWindow, Ui_MainWindow):
     # 显示得分
     def showResult(self):
         age = int(self.age_lineEdit.text())
-        Troponin = int(self.Troponin_lineEdit.text())
-        NT_ProBNP = int(self.NT_ProBNP_lineEdit.text())
-
-        QMessageBox.about(self, 'points', str(points_compute(age, Troponin, NT_ProBNP)))
+        Troponin = float(self.Troponin_lineEdit.text())
+        NT_ProBNP = float(self.NT_ProBNP_lineEdit.text())
+        stroke = int(self.stroke_lineEdit.text())
+        QMessageBox.about(self, 'points', str(points_compute(stroke, age, Troponin, NT_ProBNP)))
         self.age_lineEdit.setFocus()
 
 

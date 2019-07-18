@@ -25,7 +25,7 @@ def poly_fit(data_x, data_y, poly_deg, x_lable_name, y_lable_name):
     plt.savefig(x_lable_name+'_'+y_lable_name+'.png')
     return p
 
-def points_compute(age_input, Troponin_input, NT_ProBNP_input):
+def points_compute(stroke_input, age_input, Troponin_input, NT_ProBNP_input):
     # 定义x、y散点坐标
     age = [44, 55, 65, 75, 90]
     Troponin = [1, 2, 5, 10, 30, 75, 180]
@@ -35,13 +35,18 @@ def points_compute(age_input, Troponin_input, NT_ProBNP_input):
     points_Troponin = [0, 0.775, 1.775, 2.542, 3.75, 4.775, 5.725]
     points_NT_ProBNP = [0, 1.275, 2.542, 3.8, 5.083, 6.35, 7.5, 8.775, 10]
 
+    if(stroke_input == 1):
+        p_stroke = 5.475
+    else:
+        p_stroke = 0
+
     p_age = poly_fit(age, points_age, 1, 'age', 'points')
     p_Troponin = poly_fit(Troponin, points_Troponin, 5, 'Troponin', 'points')
     p_NT_ProBNP = poly_fit(NT_ProBNP, points_NT_ProBNP, 6, 'NT_ProBNP', 'points')
     # print('points_age: ', p_age(age_input))
     # print('points_Troponin: ', p_Troponin(Troponin_input))
     # print('points_NT_ProBNP: ', p_NT_ProBNP(NT_ProBNP_input))
-    return p_age(age_input) + p_Troponin(Troponin_input) + p_NT_ProBNP(NT_ProBNP_input)
+    return p_age(age_input) + p_Troponin(Troponin_input) + p_NT_ProBNP(NT_ProBNP_input) + p_stroke
 
     # plt.show()
 
