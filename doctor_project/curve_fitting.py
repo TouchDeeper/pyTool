@@ -49,7 +49,7 @@ class PolyFit:
         return p
 
 
-    def P_age(self):
+    def F_age(self):
         plt.clf()
         age = [44, 55, 65, 75, 90]
         points_age = [0.00, 0.75, 1.38, 2.0625, 3.0625]
@@ -90,7 +90,7 @@ class PolyFit:
         NT_ProBNP = [25, 50, 100, 200, 400, 800, 1500, 3000, 5900]
         # for temp in NT_ProBNP:
         #     temp = 0.03 * temp
-        NT_ProBNP = [0.03 * temp for temp in NT_ProBNP]
+        NT_ProBNP = [0.03 * temp for temp in NT_ProBNP] # 对横坐标进行缩放，　否则无法拟合出结果
         points_NT_ProBNP = [0, 1.275, 2.542, 3.8, 5.083, 6.35, 7.5, 8.775, 10]
         # p_NT_ProBNP = self.poly_fit(NT_ProBNP, points_NT_ProBNP, 4)
         self.__NT_ProBNP_popt, pcov = curve_fit(self.fun_NT_ProBNP, NT_ProBNP, points_NT_ProBNP)
@@ -100,7 +100,7 @@ class PolyFit:
         y = self.fun_NT_ProBNP(x, self.__NT_ProBNP_popt[0], self.__NT_ProBNP_popt[1], self.__NT_ProBNP_popt[2])
         self.plot_x_y(x, y, 'NT_ProBNP', 'points')
 
-    def get_p_Nt_ProBNP(self, x):
+    def get_p_NT_ProBNP(self, x):
         x = [0.03 * temp for temp in x]
         y = self.fun_NT_ProBNP(x, self.__NT_ProBNP_popt[0], self.__NT_ProBNP_popt[1], self.__NT_ProBNP_popt[2])
         return y
@@ -113,16 +113,23 @@ def points_compute(stroke_input, age_input, Troponin_input, NT_ProBNP_input):
     else:
         p_stroke = 0
     poly_fitter = PolyFit()
-    p_age = poly_fitter.P_age()
+    f_age = poly_fitter.F_age()
+    points_age = f_age(age_input)
+
+    for index, point in enumerate(points_age):
+        if points_age[index] < 0:
+            points_age[index] = 0
+
 
     # p_Troponin = poly_fitter.P_Troponin()
     poly_fitter.P_Troponin()
     # p_NT_ProBNP = poly_fitter.P_Nt_ProBNP()
     poly_fitter.P_Nt_ProBNP()
-    # print('points_age: ', p_age(age_input))
+    # print('points_age: ', f_age(age_input))
     # print('points_Troponin: ', poly_fitter.get_p_Troponin(Troponin_input))
     # print('points_NT_ProBNP: ', p_NT_ProBNP(NT_ProBNP_input))
-    return p_age(age_input) + poly_fitter.get_p_Troponin(Troponin_input) + poly_fitter.get_p_Nt_ProBNP(NT_ProBNP_input) + p_stroke
+
+    return points_age, poly_fitter.get_p_Troponin(Troponin_input), poly_fitter.get_p_NT_ProBNP(NT_ProBNP_input), f_age(age_input) + poly_fitter.get_p_Troponin(Troponin_input) + poly_fitter.get_p_NT_ProBNP(NT_ProBNP_input) + p_stroke
 
     # plt.show()
 
