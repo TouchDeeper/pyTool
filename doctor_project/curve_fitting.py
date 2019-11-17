@@ -20,7 +20,7 @@ class PolyFit:
         x = np.linspace(x_start, x_end, num_points)
         y = fun(x)
 
-        plot2 = plt.plot(x, y, 'r', label='polyfit values')
+        plt.plot(x, y, 'r', label='polyfit values')
         plt.xlabel(x_lable_name)
         plt.ylabel(y_lable_name)
         plt.legend(loc=4)  # 指定legend的位置右下角
@@ -47,7 +47,6 @@ class PolyFit:
         plt.plot(x, y, 's', label='original values')
 
         return p
-
 
     def F_age(self):
         plt.clf()
@@ -81,7 +80,12 @@ class PolyFit:
         self.plot_x_y(x, y, 'Troponin', 'points')
 
     def get_p_Troponin(self, x):
-        y = self.fun_Troponin(x, self.__Troponin_popt[0], self.__Troponin_popt[1], self.__Troponin_popt[2])
+        y = [0] * len(x)
+        for index, val in enumerate(x):
+            if val - 1 < 1e-5:
+                y[index] = 0
+            else:
+                y[index] = self.fun_Troponin(val, self.__Troponin_popt[0], self.__Troponin_popt[1], self.__Troponin_popt[2])
         return y
 
     def P_Nt_ProBNP(self):
@@ -101,17 +105,28 @@ class PolyFit:
         self.plot_x_y(x, y, 'NT_ProBNP', 'points')
 
     def get_p_NT_ProBNP(self, x):
-        x = [0.03 * temp for temp in x]
-        y = self.fun_NT_ProBNP(x, self.__NT_ProBNP_popt[0], self.__NT_ProBNP_popt[1], self.__NT_ProBNP_popt[2])
+        y = [0] * len(x)
+        for index, val in enumerate(x):
+            if val -25 < 1e-5:
+                y[index] = 0
+            else:
+                # x = [0.03 * temp for temp in x]
+                val = 0.03 * val
+                y[index] = self.fun_NT_ProBNP(val, self.__NT_ProBNP_popt[0], self.__NT_ProBNP_popt[1], self.__NT_ProBNP_popt[2])
         return y
 
 
 def points_compute(stroke_input, age_input, Troponin_input, NT_ProBNP_input):
 
-    if(stroke_input == 1):
-        p_stroke = 5.475
-    else:
-        p_stroke = 0
+    # if(stroke_input == 1):
+    #     p_stroke = 5.475
+    # else:
+    #     p_stroke = 0
+    points_stroke = [0] * len(stroke_input)
+    for index in range(len(stroke_input)):
+        if stroke_input[index] == 1:
+            points_stroke[index] = 5.475
+
     poly_fitter = PolyFit()
     f_age = poly_fitter.F_age()
     points_age = f_age(age_input)
@@ -128,8 +143,12 @@ def points_compute(stroke_input, age_input, Troponin_input, NT_ProBNP_input):
     # print('points_age: ', f_age(age_input))
     # print('points_Troponin: ', poly_fitter.get_p_Troponin(Troponin_input))
     # print('points_NT_ProBNP: ', p_NT_ProBNP(NT_ProBNP_input))
+    points_Troponin = poly_fitter.get_p_Troponin(Troponin_input)
 
-    return points_age, poly_fitter.get_p_Troponin(Troponin_input), poly_fitter.get_p_NT_ProBNP(NT_ProBNP_input), f_age(age_input) + poly_fitter.get_p_Troponin(Troponin_input) + poly_fitter.get_p_NT_ProBNP(NT_ProBNP_input) + p_stroke
+    points_NT_ProBNP = poly_fitter.get_p_NT_ProBNP(NT_ProBNP_input)
+
+    total_points = points_age + points_Troponin + points_NT_ProBNP + points_stroke
+    return points_age, points_Troponin, points_NT_ProBNP, points_stroke, total_points
 
     # plt.show()
 
