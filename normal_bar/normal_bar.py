@@ -47,22 +47,33 @@ def randn_skew_fast(N, alpha=0.0, loc=0.0, scale=1.0):
 
 
 def normal_customized():
-    sampleNo = 100000
-    mu1 = 0
-    sigma1 = 4
-    mu2 = 0
-    sigma2 = 2
+    sampleNo = 1000000
+    mu1 = 0.01
+    sigma1 = 0.025
+    mu2 = mu1
+    sigma2 = 0.015
     np.random.seed(0)
     s1 = np.random.normal(mu1, sigma1, sampleNo)
     s2 = np.random.normal(mu2, sigma2, sampleNo)
     for i in range(sampleNo):
-        if s1[i] > 0:
-            s1[i] = -s1[i]
-        if s2[i] < 0:
-            s2[i] = -s2[i]
+        if s1[i] > mu1:
+            s1[i] = mu1 - (s1[i] - mu1)
+        if s2[i] < mu2:
+            s2[i] = mu2 + mu2-s2[i]
     s = s1 + s2
     # np.histogram(s, bins=60, density=True)
-    plt.hist(s, normed=1, bins=100)
+    plt.figure(figsize=(10, 5))
+    plt.grid(linestyle="--")  # 设置背景网格线为虚线
+    ax = plt.gca()
+    ax.spines['top'].set_visible(False)  # 去掉上边框
+    ax.spines['right'].set_visible(False)  # 去掉右边框
+    plt.hist(s, normed=True, bins=100, histtype='step', color="black")
+    plt.xlabel('genes', fontsize=13, fontweight='bold')
+    plt.ylabel('probability density', fontsize=13, fontweight='bold')
+    plt.xticks(fontsize=12, fontweight='bold')  # 默认字体大小为10
+    plt.yticks(fontsize=12, fontweight='bold')
+    plt.title("bi-side normal distribution", fontsize=12, fontweight='bold')  # 默认字体大小为12
+    plt.vlines(mu1, 0, 15, colors="c", linestyles="dashed")
     plt.show()
 # lets check again
 
